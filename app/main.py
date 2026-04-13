@@ -6,13 +6,14 @@ g_results = {}
 
 def cache(func: Callable) -> Callable:
     @functools.wraps(func)
-    def wrapper(*args) -> Callable:
-        result = g_results.get((func.__name__, args))
-        if result is None:
-            result = func(*args)
-            g_results[(func.__name__, args)] = result
-            print("Calculating new result")
-        else:
+    def wrapper(*args,**kwargs) -> Callable:
+        key = (func, args, tuple(sorted(kwargs.items()))) 
+        if key in g_results:
             print("Getting from cache")
+            result = g_results.get(key)
+        else:
+            print("Calculating new result")
+            result = func(*args,**kwargs)
+            g_results[key] = result            
         return result
     return wrapper
